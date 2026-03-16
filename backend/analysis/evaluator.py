@@ -22,6 +22,7 @@ from backend.analysis.sport_profiles import (
     get_sport_exercises,
     get_development_plan,
 )
+from backend.analysis.exercises import GENERIC_EXERCISES_RAW
 from backend.sources import get_sources_for_sport, format_source_short
 from backend.analysis.features import extract_frame_features, FrameFeatures
 from backend.analysis.biomechanics import (
@@ -500,26 +501,23 @@ class CorrectiveExercise:
     source: str = ""  # Official source citation (e.g. "NASM (National Academy of Sports Medicine)")
 
 
-# Default source for generic corrective exercises (NASM - evidence-based)
+# Built from backend.analysis.exercises.GENERIC_EXERCISES_RAW
 _GENERIC_EXERCISE_SOURCE = "NASM Corrective Exercise (National Academy of Sports Medicine)"
 
 GENERIC_EXERCISES: Dict[str, List[CorrectiveExercise]] = {
-    "knee": [
-        CorrectiveExercise("Wall sit", "Wall sit for quad strength", "knee", "3x30s", "beginner", "", _GENERIC_EXERCISE_SOURCE),
-        CorrectiveExercise("Clam shells", "Hip rotation for glutes", "knee", "3x15 each", "beginner", "", _GENERIC_EXERCISE_SOURCE),
-    ],
-    "shoulder": [
-        CorrectiveExercise("Band pull-apart", "Posterior shoulder strength", "shoulder", "3x15", "beginner", "", _GENERIC_EXERCISE_SOURCE),
-    ],
-    "hip": [
-        CorrectiveExercise("Hip bridge", "Glute strength", "hip", "3x15", "beginner", "", _GENERIC_EXERCISE_SOURCE),
-    ],
-    "ankle": [
-        CorrectiveExercise("Calf raises", "Ankle stability", "ankle", "3x15", "beginner", "", _GENERIC_EXERCISE_SOURCE),
-    ],
-    "core": [
-        CorrectiveExercise("Plank", "Core stability", "core", "3x30s", "beginner", "", _GENERIC_EXERCISE_SOURCE),
-    ],
+    k: [
+        CorrectiveExercise(
+            ex["name"],
+            ex["description"],
+            ex["target_joint"],
+            ex["reps_sets"],
+            ex["difficulty"],
+            "",
+            ex.get("source", _GENERIC_EXERCISE_SOURCE),
+        )
+        for ex in raw_list
+    ]
+    for k, raw_list in GENERIC_EXERCISES_RAW.items()
 }
 
 

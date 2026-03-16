@@ -10,6 +10,8 @@ Each sport has:
 
 from typing import Dict, List, Optional, Tuple
 
+from backend.analysis.exercises import get_exercises_for_sport
+
 # Generic movements detected by MovementRecognizer -> sport-specific mapping
 GENERIC_MOVEMENTS = ["kick", "jump", "sprint", "punch", "swing", "throw", "squat", "lunge", "rotation", "static"]
 
@@ -64,11 +66,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Agility and speed training",
             "Phase 5: Tactics and team play",
         ],
-        "exercises": [
-            {"name": "Clam shells", "target": "hip", "reason": "Glute strength for kick control"},
-            {"name": "Single-leg balance", "target": "ankle", "reason": "Plant foot stability"},
-            {"name": "Hip flexor stretch", "target": "hip", "reason": "Range of motion for kicking"},
-        ],
+        "exercises": [],  # من backend.analysis.exercises
     },
     "basketball": {
         "name": "كرة السلة",
@@ -101,11 +99,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Dribbling and agility",
             "Phase 5: Team play and competition",
         ],
-        "exercises": [
-            {"name": "Squat jump", "target": "knee", "reason": "Jump power and landing"},
-            {"name": "Single-leg stance", "target": "ankle", "reason": "Agility stability"},
-            {"name": "Wall sit", "target": "knee", "reason": "Knee protection on landing"},
-        ],
+        "exercises": [],
     },
     "tennis": {
         "name": "التنس",
@@ -135,11 +129,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Serve and volley",
             "Phase 5: Tactics and court positioning",
         ],
-        "exercises": [
-            {"name": "Band pull-apart", "target": "shoulder", "reason": "Posterior shoulder strength"},
-            {"name": "Seated torso twist", "target": "core", "reason": "Rotation for strokes"},
-            {"name": "Rotator cuff exercises", "target": "shoulder", "reason": "Injury prevention"},
-        ],
+        "exercises": [],
     },
     "gymnastics": {
         "name": "الجمباز",
@@ -165,11 +155,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Routine development",
             "Phase 5: Competition readiness",
         ],
-        "exercises": [
-            {"name": "Hollow hold", "target": "core", "reason": "Core control"},
-            {"name": "Shoulder mobility", "target": "shoulder", "reason": "Overhead positions"},
-            {"name": "Single-leg balance", "target": "ankle", "reason": "Beam stability"},
-        ],
+        "exercises": [],
     },
     "martial_arts": {
         "name": "الفنون القتالية",
@@ -195,10 +181,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Combinations",
             "Phase 5: Sparring",
         ],
-        "exercises": [
-            {"name": "Band pull-apart", "target": "shoulder", "reason": "Shoulder balance"},
-            {"name": "Hip flexor stretch", "target": "hip", "reason": "Kick range"},
-        ],
+        "exercises": [],
     },
     "boxing": {
         "name": "الملاكمة",
@@ -227,11 +210,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Combinations and footwork",
             "Phase 5: Sparring and competition",
         ],
-        "exercises": [
-            {"name": "Band pull-apart", "target": "shoulder", "reason": "Shoulder balance"},
-            {"name": "Push-ups", "target": "core", "reason": "Push power and guard"},
-            {"name": "Torso twist", "target": "core", "reason": "Rotation for power"},
-        ],
+        "exercises": [],
     },
     "weightlifting": {
         "name": "رفع الأثقال",
@@ -260,11 +239,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Strength program (e.g. 5x5)",
             "Phase 5: Max weights and competition",
         ],
-        "exercises": [
-            {"name": "Wall sit", "target": "knee", "reason": "Knee tracking"},
-            {"name": "Hip bridge", "target": "hip", "reason": "Hip drive for squat"},
-            {"name": "Plank", "target": "core", "reason": "Core bracing"},
-        ],
+        "exercises": [],
     },
     "running": {
         "name": "الجري",
@@ -292,11 +267,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Speed and economy",
             "Phase 5: Racing",
         ],
-        "exercises": [
-            {"name": "Hip flexor stretch", "target": "hip", "reason": "Range for stride"},
-            {"name": "Calf raises", "target": "ankle", "reason": "Ankle power"},
-            {"name": "Glute bridges", "target": "hip", "reason": "Hip drive"},
-        ],
+        "exercises": [],
     },
     "yoga": {
         "name": "اليوغا",
@@ -321,11 +292,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Flows and sequences",
             "Phase 5: Advanced practice",
         ],
-        "exercises": [
-            {"name": "Cat-cow", "target": "spine", "reason": "Spinal mobility"},
-            {"name": "Downward dog", "target": "shoulder", "reason": "Shoulder and hamstring"},
-            {"name": "Tree pose", "target": "balance", "reason": "Balance and focus"},
-        ],
+        "exercises": [],
     },
     "golf": {
         "name": "الجولف",
@@ -349,10 +316,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Follow-through",
             "Phase 5: Accuracy and distance",
         ],
-        "exercises": [
-            {"name": "Seated torso twist", "target": "core", "reason": "Rotation for swing"},
-            {"name": "Hip rotation drill", "target": "hip", "reason": "Power from hip"},
-        ],
+        "exercises": [],
     },
     "baseball": {
         "name": "البيسبول",
@@ -375,10 +339,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Advanced throwing",
             "Phase 5: Game play",
         ],
-        "exercises": [
-            {"name": "Rotator cuff", "target": "shoulder", "reason": "Throw injury prevention"},
-            {"name": "Core rotation", "target": "core", "reason": "Bat and throw power"},
-        ],
+        "exercises": [],
     },
     "volleyball": {
         "name": "الكرة الطائرة",
@@ -403,10 +364,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 4: Safe landing",
             "Phase 5: Tactics",
         ],
-        "exercises": [
-            {"name": "Squat jump", "target": "knee", "reason": "Jump power"},
-            {"name": "Single-leg landing", "target": "ankle", "reason": "Safe landing"},
-        ],
+        "exercises": [],
     },
     "hockey": {
         "name": "الهوكي",
@@ -462,11 +420,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Phase 3: Power (jumps, sprints)",
             "Phase 4: Integration and conditioning",
         ],
-        "exercises": [
-            {"name": "Plank", "target": "core", "reason": "Core stability"},
-            {"name": "Squats", "target": "leg", "reason": "Leg strength"},
-            {"name": "Glute bridge", "target": "hip", "reason": "Hip stability"},
-        ],
+        "exercises": [],
     },
     "unknown": {
         "name": "غير محدد",
@@ -480,10 +434,7 @@ SPORT_PROFILES: Dict[str, dict] = {
             "Select a sport for movement-specific analysis",
             "Focus on general posture and movement quality",
         ],
-        "exercises": [
-            {"name": "Plank", "target": "core", "reason": "Core stability"},
-            {"name": "Squats", "target": "leg", "reason": "Leg strength"},
-        ],
+        "exercises": [],
     },
 }
 
@@ -528,10 +479,14 @@ def get_sport_profile(sport: str) -> dict:
         from backend.sports.registry import get_analyzer
         analyzer = get_analyzer(key)
         if analyzer:
-            return analyzer.get_profile()
+            profile = analyzer.get_profile()
+            profile["exercises"] = get_exercises_for_sport(key)
+            return profile
     except ImportError:
         pass
-    return SPORT_PROFILES.get(key, SPORT_PROFILES["unknown"]).copy()
+    profile = SPORT_PROFILES.get(key, SPORT_PROFILES["unknown"]).copy()
+    profile["exercises"] = get_exercises_for_sport(key)
+    return profile
 
 
 def get_technical_movements(sport: str) -> List[dict]:
