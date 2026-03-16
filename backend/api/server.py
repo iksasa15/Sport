@@ -11,7 +11,7 @@ import json
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -117,7 +117,9 @@ def _cleanup_expired_jobs():
 
 @app.get("/")
 def root():
-    """Health check or serve frontend."""
+    """Redirect to frontend UI; API info at /docs."""
+    if FRONTEND_DIR.exists():
+        return RedirectResponse(url="/app/", status_code=302)
     return {"status": "ok", "service": "Sports Movement Analysis API", "docs": "/docs"}
 
 
