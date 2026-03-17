@@ -1,7 +1,8 @@
 # Core (pinned for reproducibility; update with care)
-numpy>=1.24.0,<3.0.0
+numpy>=1.24.0,<2.0.0
 opencv-python>=4.8.0,<5.0.0
-mediapipe>=0.10.0,<0.11.0
+mediapipe>=0.10.14,<0.11.0
+protobuf>=6.31.1,<7.0.0
 Pillow>=10.0.0,<11.0.0
 
 # API & Server

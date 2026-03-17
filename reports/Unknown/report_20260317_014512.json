@@ -1,0 +1,175 @@
+{
+  "metadata": {
+    "generated_at": "2026-03-17T01:45:13.000295",
+    "report_version": "1.0",
+    "sport": "unknown",
+    "sport_name": "General"
+  },
+  "summary": {
+    "overall_score": 7.8,
+    "overall_score_100": 78.4,
+    "total_frames": 1,
+    "video_fps": 29.854368932038835,
+    "video_width": 406,
+    "video_height": 720,
+    "processing_time_sec": 2.94
+  },
+  "movements": [
+    {
+      "id": "general",
+      "name_en": "General",
+      "name": "General",
+      "score": 7.8,
+      "frames_count": 1,
+      "feedback": "Detected movement",
+      "strengths": [],
+      "weaknesses": [],
+      "improvement_note": ""
+    }
+  ],
+  "feedback": {
+    "strengths": [
+      "Left Knee alignment",
+      "Right Knee alignment",
+      "Shoulders alignment",
+      "Hips alignment",
+      "Ankles alignment"
+    ],
+    "errors": [
+      "Knee angle outside safe range (landing/load)"
+    ],
+    "coaching_feedback": [
+      {
+        "error": "Knee angle outside safe range (landing/load)",
+        "feedback": "Focus on correct form and gradual improvement. Practice with slow, controlled movements. Barbell path should stay over mid-foot; control the descent."
+      }
+    ],
+    "recommendations": [
+      {
+        "name": "Plank",
+        "description": "Core stability",
+        "target_joint": "core",
+        "reps_sets": "3x12",
+        "sport_focus": "unknown"
+      },
+      {
+        "name": "Squats",
+        "description": "Leg strength",
+        "target_joint": "leg",
+        "reps_sets": "3x12",
+        "sport_focus": "unknown"
+      },
+      {
+        "name": "Wall sit",
+        "description": "Wall sit for quad strength",
+        "target_joint": "knee",
+        "reps_sets": "3x30s",
+        "sport_focus": ""
+      }
+    ],
+    "development_plan": [
+      "Skill level: Advanced - fine-tune details and optimize performance.",
+      "Priority focus: Address 'Knee angle outside safe range (landing/load)' in your next training session.",
+      "Select a sport for movement-specific analysis",
+      "Focus on general posture and movement quality"
+    ]
+  },
+  "injury_risk": {
+    "score": 100.0,
+    "warnings": [],
+    "possible_injuries": []
+  },
+  "frames": [
+    {
+      "frame_idx": 0,
+      "overall_score": 78.4,
+      "movement": "general",
+      "errors": [
+        "Knee angle outside safe range (landing/load)"
+      ],
+      "joint_scores": [
+        {
+          "name": "left_knee",
+          "score": 96.79165112824103,
+          "is_correct": true,
+          "feedback": "Knee angle: 177° ✓"
+        },
+        {
+          "name": "right_knee",
+          "score": 92.21009215154942,
+          "is_correct": true,
+          "feedback": "Knee angle: 179° ✓"
+        },
+        {
+          "name": "shoulders",
+          "score": 98.50130081176758,
+          "is_correct": true,
+          "feedback": "Shoulders level ✓"
+        },
+        {
+          "name": "hips",
+          "score": 98.69921803474426,
+          "is_correct": true,
+          "feedback": "Hips level ✓"
+        },
+        {
+          "name": "ankles",
+          "score": 98.18832874298096,
+          "is_correct": true,
+          "feedback": "Ankle stability ✓"
+        },
+        {
+          "name": "left_elbow",
+          "score": 27.789525355915885,
+          "is_correct": false,
+          "feedback": "Elbow angle: 49°"
+        },
+        {
+          "name": "right_elbow",
+          "score": 16.698967250668645,
+          "is_correct": false,
+          "feedback": "Elbow angle: 43°"
+        }
+      ],
+      "skill_metrics": {
+        "balance": 9.8,
+        "accuracy": 7.0,
+        "alignment": 9.7,
+        "timing": 6.5,
+        "power": 7.1
+      },
+      "injury_risk_warnings": [],
+      "injury_risk_score": 100.0,
+      "features_for_training": {
+        "knee_angles": {
+          "left_knee": 89.41575869556964,
+          "right_knee": 102.0760483711165
+        },
+        "hip_angles": {
+          "left_hip": 146.01789718018819,
+          "right_hip": 142.31782043761885
+        },
+        "ankle_angles": {
+          "left_ankle": 43.104603925900214,
+          "right_ankle": 53.853166146729734
+        },
+        "shoulder_angles": {
+          "left_shoulder": 146.16256253863975,
+          "right_shoulder": 141.7745379129884
+        },
+        "elbow_angles": {
+          "left_elbow": 106.85727479324822,
+          "right_elbow": 102.53497901763885
+        },
+        "symmetry": 0.965,
+        "stability": 0.956
+      },
+      "key_frame_event": null
+    }
+  ],
+  "object_interaction": {
+    "detected_labels": [
+      "barbell"
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 """FastAPI server for Sports Movement Analysis."""
 
+import base64
 import logging
 import time
 import uuid
@@ -8,6 +9,7 @@ from typing import Optional
 
 import asyncio
 import json
+import numpy as np
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -140,6 +142,74 @@ def health():
     }
 
 
+@app.post("/api/mediapipe/fingers")
+def mediapipe_fingers(body: dict = Body(default={})):
+    """
+    Stub for app camera: accepts image_base64, returns empty hands.
+    Keeps camera screen working without 404; real hand detection can be added later.
+    """
+    return {
+        "success": True,
+        "hands": {"detected": False, "hands": []},
+    }
+
+
+# Lazy-loaded pose estimator for live camera overlay (single-frame pose).
+_live_pose_estimator = None
+_live_pose_ts_ms = [0]  # mutable so we can update
+
+
+def _get_live_pose_estimator():
+    global _live_pose_estimator
+    if _live_pose_estimator is None:
+        try:
+            from backend.models.pose_estimator import PoseEstimator, POSE_CONNECTIONS
+            _live_pose_estimator = ("ok", PoseEstimator(model_variant="lite"), POSE_CONNECTIONS)
+        except Exception as e:
+            logger.warning("Live pose estimator init failed: %s", e)
+            _live_pose_estimator = ("fail", None, None)
+    return _live_pose_estimator
+
+
+@app.post("/api/mediapipe/pose")
+def mediapipe_pose(body: dict = Body(default={})):
+    """
+    Live camera pose: accept image_base64 (JPEG), return body landmarks for skeleton overlay.
+    Same pose detection as video analysis; returns normalized (x,y,z) and connections to draw.
+    """
+    import cv2
+    raw = body.get("image_base64") or ""
+    try:
+        img_buf = base64.b64decode(raw)
+    except Exception:
+        return {"success": False, "landmarks": [], "connections": []}
+    frame = np.frombuffer(img_buf, dtype=np.uint8)
+    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+    if frame is None:
+        return {"success": False, "landmarks": [], "connections": []}
+    status, estimator, connections = _get_live_pose_estimator()
+    if status != "ok" or estimator is None:
+        return {"success": False, "landmarks": [], "connections": []}
+    try:
+        _live_pose_ts_ms[0] += 33
+        result, landmarks_dict = estimator.process_frame(frame, timestamp_ms=_live_pose_ts_ms[0])
+    except Exception as e:
+        logger.debug("Pose frame failed: %s", e)
+        return {"success": False, "landmarks": [], "connections": []}
+    from backend.models.pose_estimator import LANDMARK_NAMES
+    landmarks_list = []
+    for i, name in enumerate(LANDMARK_NAMES):
+        if name in landmarks_dict:
+            x, y, z = landmarks_dict[name]
+            landmarks_list.append({"id": i, "x": x, "y": y, "z": z})
+    conn_list = [list(pair) for pair in (connections or [])]
+    return {
+        "success": True,
+        "landmarks": landmarks_list,
+        "connections": conn_list,
+    }
+
+
 if FRONTEND_DIR.exists():
     app.mount("/app", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 
@@ -191,6 +261,49 @@ def list_sports():
         if k != "unknown"
     ]
     return {"sports": sports}
+
+
+def _normalize_exercise(raw: dict, sport: str) -> dict:
+    """Unify sport (name/target/reason) and generic (name/description/target_joint/reps_sets/difficulty) into one shape."""
+    name = raw.get("name") or ""
+    description = raw.get("reason") or raw.get("description") or ""
+    target = raw.get("target") or raw.get("target_joint") or ""
+    out = {"name": name, "description": description, "target": target, "sport": sport}
+    if raw.get("reps_sets") is not None:
+        out["reps_sets"] = raw["reps_sets"]
+    if raw.get("difficulty") is not None:
+        out["difficulty"] = raw["difficulty"]
+    return out
+
+
+@app.get("/api/exercises")
+def list_exercises(sport: Optional[str] = None):
+    """
+    List corrective exercises. Optional query: sport (e.g. football, basketball).
+    If sport is omitted or 'all', returns exercises from all sports plus generic.
+    """
+    from backend.analysis.exercises import get_exercises_for_sport, SPORT_EXERCISES, GENERIC_EXERCISES_RAW
+
+    result = []
+    if sport and sport.strip().lower() not in ("", "all"):
+        key = sport.strip().lower()
+        if key == "soccer":
+            key = "football"
+        if key in SPORT_EXERCISES:
+            for ex in get_exercises_for_sport(key):
+                result.append(_normalize_exercise(ex, key))
+            return {"exercises": result}
+        # unknown sport: return empty or fallback to all
+    # no sport or "all": return all sport exercises + generic
+    for sport_key, exercises in SPORT_EXERCISES.items():
+        if sport_key == "soccer" or sport_key == "track":
+            continue
+        for ex in exercises:
+            result.append(_normalize_exercise(ex, sport_key))
+    for joint, exercises in GENERIC_EXERCISES_RAW.items():
+        for ex in exercises:
+            result.append(_normalize_exercise(ex, "generic"))
+    return {"exercises": result}
 
 
 @app.post("/api/analyze")
@@ -456,12 +569,15 @@ def download_output(filename: str):
 
 def run_server(host: str = "0.0.0.0", port: int = 8000):
     """Run the API server. Preloads YOLO in background for faster first analysis."""
+    import os
     import threading
     import uvicorn
+    port = int(os.environ.get("PORT", port))
     preload = threading.Thread(target=_preload_yolo, daemon=True)
     preload.start()
     uvicorn.run(app, host=host, port=port)
 
 
 if __name__ == "__main__":
-    run_server()
+    import os
+    run_server(port=int(os.environ.get("PORT", 5001)))

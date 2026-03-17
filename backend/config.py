@@ -48,9 +48,11 @@ CROP_TO_ATHLETE = False  # Crop to pose bbox (experimental)
 FAST_PROCESSING_MODE = os.environ.get("FAST_PROCESSING", "").lower() in ("1", "true", "yes")
 
 
-def _int_env(name: str, default: int) -> int:
+def _int_env(name: str, default: int, allow_zero: bool = False) -> int:
+    """Read int from env. If allow_zero=False, result is at least 1 (for intervals/counts)."""
     try:
-        return max(1, int(os.environ.get(name, str(default))))
+        v = int(os.environ.get(name, str(default)))
+        return v if allow_zero else max(1, v)
     except (ValueError, TypeError):
         return default
 
@@ -81,9 +83,6 @@ MIN_TRACKING_CONFIDENCE = 0.5
 DEFAULT_FPS = 30
 MAX_VIDEO_DURATION_SEC = 300  # 5 minutes
 MAX_UPLOAD_MB = 500  # Max video file size
-# Quick preview: analyze only first N frames (0=disabled). Set MAX_FRAMES_QUICK_PREVIEW=300 for ~10 sec
-MAX_FRAMES_QUICK_PREVIEW = _int_env("MAX_FRAMES_QUICK_PREVIEW", 0)
-
 # Security - CORS allowed origins (add production origin when deploying)
 # Override via CORS_ORIGINS env: comma-separated list, e.g. "https://app.example.com"
 _cors_env = os.environ.get("CORS_ORIGINS", "").strip()

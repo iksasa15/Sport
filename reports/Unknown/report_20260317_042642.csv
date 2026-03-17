@@ -1,0 +1,136 @@
+=== AI Sports Movement Analysis Report ===
+Generated,2026-03-17 04:26
+Sport,General
+Total Frames,205
+Overall Score (0-10),6.6
+Video FPS,29.854368932038835
+Processing Time (sec),7.4
+
+--- Movements Summary ---
+Movement,Score (0-10),Frames,Feedback
+General,7.9,27,Detected movement
+Punch,6.4,44,Detected movement
+Squat,6.2,15,Detected movement
+Jump,5.6,17,Detected movement
+
+--- Points of Strength ---
+Shoulders alignment
+Hips alignment
+Ankles alignment
+
+--- Detected Errors ---
+Knee angle outside safe range (landing/load)
+
+--- Injury Risk ---
+Injury Risk Score (0-100),100
+
+--- Coaching Feedback ---
+Error,Feedback
+Knee angle outside safe range (landing/load),"Focus on correct form and gradual improvement. Practice with slow, controlled movements. Barbell path should stay over mid-foot; control the descent."
+
+--- Frame-by-Frame Analysis ---
+Frame,overall_score,movement,errors
+0,78.4,general,Knee angle outside safe range (landing/load)
+1,79.0,general,Knee angle outside safe range (landing/load)
+2,77.2,general,Knee angle outside safe range (landing/load)
+3,79.9,general,Knee angle outside safe range (landing/load)
+4,77.3,general,Knee angle outside safe range (landing/load)
+5,80.3,general,Knee angle outside safe range (landing/load)
+6,76.4,general,Knee angle outside safe range (landing/load)
+7,79.7,general,Knee angle outside safe range (landing/load)
+8,77.4,general,Knee angle outside safe range (landing/load)
+9,80.3,general,Knee angle outside safe range (landing/load)
+10,78.1,general,Knee angle outside safe range (landing/load)
+11,80.6,general,Knee angle outside safe range (landing/load)
+12,78.7,general,Knee angle outside safe range (landing/load)
+13,81.1,general,Knee angle outside safe range (landing/load)
+14,79.5,general,Knee angle outside safe range (landing/load)
+15,80.0,general,Knee angle outside safe range (landing/load)
+16,78.1,general,Knee angle outside safe range (landing/load)
+17,79.1,general,Knee angle outside safe range (landing/load)
+18,75.2,general,Knee angle outside safe range (landing/load)
+19,77.7,general,Knee angle outside safe range (landing/load)
+20,75.0,general,Knee angle outside safe range (landing/load)
+21,80.5,general,Knee angle outside safe range (landing/load)
+22,87.5,general,Knee angle outside safe range (landing/load)
+23,95.0,general,Knee angle outside safe range (landing/load)
+24,81.3,general,Knee angle outside safe range (landing/load)
+25,73.8,general,Knee angle outside safe range (landing/load)
+26,73.0,general,Knee angle outside safe range (landing/load)
+27,73.3,punch,Knee angle outside safe range (landing/load)
+28,73.5,punch,Knee angle outside safe range (landing/load)
+29,73.5,punch,Knee angle outside safe range (landing/load)
+30,73.1,punch,Knee angle outside safe range (landing/load)
+31,72.9,punch,Knee angle outside safe range (landing/load)
+32,86.3,punch,Knee angle outside safe range (landing/load)
+33,97.9,punch,Knee angle outside safe range (landing/load)
+34,84.4,punch,Knee angle outside safe range (landing/load)
+35,80.4,punch,Knee angle outside safe range (landing/load)
+36,79.2,punch,Knee angle outside safe range (landing/load)
+37,66.4,punch,Knee angle outside safe range (landing/load)
+38,53.8,punch,Knee angle outside safe range (landing/load)
+39,53.4,punch,Knee angle outside safe range (landing/load)
+40,54.1,punch,Knee angle outside safe range (landing/load)
+41,52.8,punch,Knee angle outside safe range (landing/load)
+42,53.3,punch,Knee angle outside safe range (landing/load)
+43,52.5,punch,Knee angle outside safe range (landing/load)
+44,52.2,punch,Knee angle outside safe range (landing/load)
+45,52.4,punch,Knee angle outside safe range (landing/load)
+46,50.7,punch,Knee angle outside safe range (landing/load)
+47,49.8,punch,Knee angle outside safe range (landing/load)
+48,49.8,punch,Knee angle outside safe range (landing/load)
+49,49.7,punch,Knee angle outside safe range (landing/load)
+50,49.4,punch,Knee angle outside safe range (landing/load)
+51,49.5,punch,Knee angle outside safe range (landing/load)
+52,62.2,punch,Knee angle outside safe range (landing/load)
+53,73.2,punch,Knee angle outside safe range (landing/load)
+54,74.2,punch,Knee angle outside safe range (landing/load)
+55,73.5,punch,Knee angle outside safe range (landing/load)
+56,71.7,punch,Knee angle outside safe range (landing/load)
+57,72.1,punch,Knee angle outside safe range (landing/load)
+58,71.9,punch,Knee angle outside safe range (landing/load)
+59,72.4,punch,Knee angle outside safe range (landing/load)
+60,73.8,punch,Knee angle outside safe range (landing/load)
+61,74.0,punch,Knee angle outside safe range (landing/load)
+62,96.8,punch,Knee angle outside safe range (landing/load)
+63,62.5,punch,Knee angle outside safe range (landing/load)
+64,50.7,punch,Knee angle outside safe range (landing/load)
+65,49.3,punch,Knee angle outside safe range (landing/load)
+66,49.4,punch,Knee angle outside safe range (landing/load)
+67,49.0,punch,Knee angle outside safe range (landing/load)
+68,49.3,punch,Knee angle outside safe range (landing/load)
+69,49.2,punch,Knee angle outside safe range (landing/load)
+70,49.4,punch,Knee angle outside safe range (landing/load)
+71,49.1,squat,Knee angle outside safe range (landing/load)
+72,49.3,squat,Knee angle outside safe range (landing/load)
+73,49.4,squat,Knee angle outside safe range (landing/load)
+74,49.5,squat,Knee angle outside safe range (landing/load)
+75,49.5,squat,Knee angle outside safe range (landing/load)
+76,49.5,squat,Knee angle outside safe range (landing/load)
+77,55.2,squat,Knee angle outside safe range (landing/load)
+78,69.6,squat,Knee angle outside safe range (landing/load)
+79,74.3,squat,Knee angle outside safe range (landing/load)
+80,73.9,squat,Knee angle outside safe range (landing/load)
+81,72.0,squat,Knee angle outside safe range (landing/load)
+82,70.3,squat,Knee angle outside safe range (landing/load)
+83,70.0,squat,Knee angle outside safe range (landing/load)
+84,69.8,squat,Knee angle outside safe range (landing/load)
+85,71.9,squat,Knee angle outside safe range (landing/load)
+86,72.9,jump,Knee angle outside safe range (landing/load)
+87,74.0,jump,Knee angle outside safe range (landing/load)
+88,94.4,jump,Knee angle outside safe range (landing/load)
+89,59.1,jump,Knee angle outside safe range (landing/load)
+90,49.4,jump,Knee angle outside safe range (landing/load)
+91,49.6,jump,Knee angle outside safe range (landing/load)
+92,49.6,jump,Knee angle outside safe range (landing/load)
+93,49.7,jump,Knee angle outside safe range (landing/load)
+94,49.8,jump,Knee angle outside safe range (landing/load)
+95,49.6,jump,Knee angle outside safe range (landing/load)
+96,49.7,jump,Knee angle outside safe range (landing/load)
+97,49.6,jump,Knee angle outside safe range (landing/load)
+98,49.4,jump,Knee angle outside safe range (landing/load)
+99,49.4,jump,Knee angle outside safe range (landing/load)
+100,49.3,jump,Knee angle outside safe range (landing/load)
+101,49.5,jump,Knee angle outside safe range (landing/load)
+102,49.5,jump,Knee angle outside safe range (landing/load)
+

@@ -1,0 +1,33 @@
+=== AI Sports Movement Analysis Report ===
+Generated,2026-03-17 04:23
+Sport,General
+Total Frames,1
+Overall Score (0-10),7.8
+Video FPS,29.854368932038835
+Processing Time (sec),0.3
+
+--- Movements Summary ---
+Movement,Score (0-10),Frames,Feedback
+General,7.8,1,Detected movement
+
+--- Points of Strength ---
+Left Knee alignment
+Right Knee alignment
+Shoulders alignment
+Hips alignment
+Ankles alignment
+
+--- Detected Errors ---
+Knee angle outside safe range (landing/load)
+
+--- Injury Risk ---
+Injury Risk Score (0-100),100
+
+--- Coaching Feedback ---
+Error,Feedback
+Knee angle outside safe range (landing/load),"Focus on correct form and gradual improvement. Practice with slow, controlled movements. Barbell path should stay over mid-foot; control the descent."
+
+--- Frame-by-Frame Analysis ---
+Frame,overall_score,movement,errors
+0,78.4,general,Knee angle outside safe range (landing/load)
+

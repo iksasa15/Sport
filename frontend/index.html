@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Sports Movement Analysis</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="container">
     <h1>AI Sports Coach</h1>
-    <p class="subtitle">Real-time pose overlay • Per-movement scoring (0–10) • Errors, strengths, improvements • PDF Report</p>
+    <p class="subtitle">Real-time pose overlay • Per-movement scoring (0–10) • Errors, strengths, improvements • PDF
+      Report</p>
 
     <div class="step-section">
       <h2 id="sportHeading">1. Select Sport</h2>
@@ -25,7 +28,8 @@
         <label><input type="radio" name="source" value="upload" checked> Upload Video</label>
         <label><input type="radio" name="source" value="camera"> Use Camera</label>
       </div>
-      <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload video - click or drag file">
+      <div class="upload-zone" id="uploadZone" role="button" tabindex="0"
+        aria-label="Upload video - click or drag file">
         <input type="file" id="videoFile" accept="video/*" aria-hidden="true">
         <span class="upload-text" id="uploadText">Click or drag video here</span>
         <span id="uploadLoading" class="loading-hint" aria-live="polite"></span>
@@ -39,7 +43,9 @@
     </div>
 
     <div class="progress-section hidden" id="progressSection">
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
       <p id="progressText">Processing...</p>
     </div>
 
@@ -94,4 +100,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>

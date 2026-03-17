@@ -16,13 +16,18 @@ from backend.config import POSE_MODEL_VARIANT
 
 logger = logging.getLogger("sport_analysis.pose")
 
-# MediaPipe Tasks API (new - no solutions)
+# MediaPipe Tasks API (PoseLandmarker). Requires mediapipe>=0.10.14.
 try:
     from mediapipe.tasks.python import BaseOptions
     from mediapipe.tasks.python import vision
     from mediapipe.tasks.python.vision.core import image as mp_image
     HAS_TASKS = True
-except ImportError:
+except ImportError as e:
+    logger.debug("MediaPipe tasks import failed: %s", e)
+    if "runtime_version" in str(e) or "protobuf" in str(e).lower():
+        logger.warning(
+            "MediaPipe failed due to protobuf. Upgrade: pip install 'protobuf>=6.31.1,<7'"
+        )
     HAS_TASKS = False
 
 # Pose landmark names (33 landmarks in MediaPipe)
@@ -80,7 +85,9 @@ class PoseEstimator:
 
     def __init__(self, model_variant: Optional[str] = None):
         if not HAS_TASKS:
-            raise RuntimeError("MediaPipe tasks not available. Install mediapipe.")
+            raise RuntimeError(
+                "MediaPipe Tasks API not available. Install or upgrade: pip install --upgrade 'mediapipe>=0.10.14'"
+            )
         variant = model_variant or POSE_MODEL_VARIANT
         model_path = _ensure_model(variant)
         base_options = BaseOptions(model_asset_path=str(model_path))

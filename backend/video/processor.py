@@ -10,6 +10,10 @@ Processes video frame-by-frame:
 
 import base64
 import logging
+import os
+import shutil
+import subprocess
+import tempfile
 import time
 from collections import Counter, defaultdict
 from datetime import datetime
@@ -45,7 +49,6 @@ from backend.config import (
     FAST_PROCESSING_MODE,
     OBJECT_DETECTION_INTERVAL,
     LIVE_CALLBACK_INTERVAL,
-    MAX_FRAMES_QUICK_PREVIEW,
 )
 from backend.models.movement_recognizer import MovementRecognizer
 from backend.video.preprocessor import VideoPreprocessor, PreprocessOptions
@@ -58,6 +61,79 @@ from backend.models.sport_inferencer import infer_sport
 from backend.video.overlay import VideoOverlay
 
 logger = logging.getLogger("sport_analysis.processor")
+
+
+def _create_video_writer(path: str, fps: float, width: int, height: int) -> Optional[cv2.VideoWriter]:
+    """Create VideoWriter. Prefer mp4v so writer actually opens (avc1 often fails); overlay is per-frame live."""
+    if width <= 0 or height <= 0 or fps <= 0:
+        logger.warning("Invalid video writer params: %dx%d @ %.1f fps", width, height, fps)
+        return None
+    # Try mp4v first so we always get a working writer (otherwise output can be 0 sec)
+    for fourcc_name in ("mp4v", "avc1", "H264", "h264", "X264"):
+        try:
+            fourcc = cv2.VideoWriter_fourcc(*fourcc_name)
+            w = cv2.VideoWriter(path, fourcc, fps, (width, height))
+            if w.isOpened():
+                logger.info("Video writer opened: %s, fourcc=%s, %.0fx%.0f @ %.1f fps", path, fourcc_name, width, height, fps)
+                return w
+            w.release()
+        except Exception as e:
+            logger.debug("Codec %s failed: %s", fourcc_name, e)
+    logger.error("No video codec opened for %s", path)
+    return None
+
+
+def _valid_output_path(path: Optional[str]) -> Optional[str]:
+    """Return path if it exists and has size > 0, else None (so we don't return broken video URL)."""
+    if not path:
+        return None
+    try:
+        p = Path(path)
+        if p.is_file() and p.stat().st_size > 0:
+            return path
+    except OSError:
+        pass
+    return None
+
+
+def _reencode_to_h264_for_ios(path: str) -> bool:
+    """Re-encode overlay video to H.264 so it plays and saves correctly on iOS (Photos app, device)."""
+    try:
+        ffmpeg = shutil.which("ffmpeg")
+        if not ffmpeg:
+            logger.warning("ffmpeg not found; output may not play when saved on iOS. Install ffmpeg for H.264.")
+            return False
+        p = Path(path)
+        if not p.is_file() or p.stat().st_size == 0:
+            return False
+        fd, tmp = tempfile.mkstemp(suffix=".mp4", prefix="overlay_h264_")
+        try:
+            os.close(fd)
+            # -profile:v main + level 4.0 = broad compatibility (iOS, Photos); -movflags +faststart = plays after save
+            rc = subprocess.run(
+                [
+                    ffmpeg, "-y", "-i", path,
+                    "-c:v", "libx264", "-preset", "fast", "-pix_fmt", "yuv420p",
+                    "-profile:v", "main", "-level", "4.0",
+                    "-movflags", "+faststart",
+                    tmp,
+                ],
+                capture_output=True,
+                timeout=300,
+            )
+            if rc.returncode == 0 and Path(tmp).is_file():
+                shutil.move(tmp, path)
+                logger.info("Re-encoded overlay to H.264 for iOS: %s", path)
+                return True
+        finally:
+            if Path(tmp).exists():
+                try:
+                    Path(tmp).unlink()
+                except OSError:
+                    pass
+    except Exception as e:
+        logger.debug("ffmpeg re-encode skipped: %s", e)
+    return False
 
 
 def _score_100_to_10(score_100: float) -> float:
@@ -117,6 +193,8 @@ class VideoProcessor:
 
         overlay_name = f"overlay_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
         out_path = (output_path or str(self.output_dir / overlay_name)) if not skip_overlay else None
+        # Write to temp first so we don't leave a 0-byte or corrupt file at out_path if writer fails
+        overlay_write_path: Optional[str] = None  # temp path while writing
         writer = None  # Lazy init when we know preprocessed frame size
 
         pose_estimator = (
@@ -332,9 +410,26 @@ class VideoProcessor:
                 frame_out = frame
                 if not skip_overlay and out_path:
                     if writer is None:
-                        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-                        writer = cv2.VideoWriter(out_path, fourcc, fps, (frame.shape[1], frame.shape[0]))
-                    if writer:
+                        # Write to temp file first; move to out_path only when we have a valid file (avoids 0-sec/corrupt)
+                        if overlay_write_path is None:
+                            fd, overlay_write_path = tempfile.mkstemp(suffix=".mp4", prefix="overlay_", dir=str(self.output_dir))
+                            os.close(fd)
+                        # Output fps = input fps / skip so duration matches (avoid 0-sec or too-short video)
+                        out_fps = max(1.0, fps / dynamic_skip)
+                        writer = _create_video_writer(
+                            overlay_write_path, out_fps, frame.shape[1], frame.shape[0]
+                        )
+                        if writer is None:
+                            writer = cv2.VideoWriter(
+                                overlay_write_path,
+                                cv2.VideoWriter_fourcc(*"mp4v"),
+                                out_fps,
+                                (frame.shape[1], frame.shape[0]),
+                            )
+                            if not writer.isOpened():
+                                logger.error("Fallback mp4v writer failed to open; overlay video will be empty")
+                                writer = None
+                    if writer is not None and writer.isOpened():
                         try:
                             frame_out = overlay.draw_overlay(
                                 frame,
@@ -352,10 +447,11 @@ class VideoProcessor:
                                 joint_risk_levels=getattr(eval_result_for_overlay, "joint_risk_levels", None) or {},
                                 injury_risk_score=getattr(eval_result_for_overlay, "injury_risk_score", None),
                             )
-                            writer.write(frame_out)
+                            to_write = np.ascontiguousarray(frame_out)
+                            writer.write(to_write)
                         except (cv2.error, TypeError, ValueError) as e:
                             logger.warning("Overlay draw failed frame %d: %s", frame_idx, e)
-                            writer.write(frame)
+                            writer.write(np.ascontiguousarray(frame))
 
                 if self.on_frame and not skip_overlay and frame_idx % live_callback_interval == 0:
                     try:
@@ -392,9 +488,6 @@ class VideoProcessor:
                         logger.debug("Frame callback failed frame %d: %s", frame_idx, e)
 
                 frame_idx += 1
-                if MAX_FRAMES_QUICK_PREVIEW and frame_idx >= MAX_FRAMES_QUICK_PREVIEW:
-                    logger.info("Quick preview: stopping at %d frames", frame_idx)
-                    break
                 if frame_idx % 30 == 0:
                     logger.info("Processed %d frames", frame_idx)
                     if frame_errors_last_30:
@@ -415,6 +508,32 @@ class VideoProcessor:
             if writer:
                 writer.release()
             pose_estimator.close()
+            # Move temp overlay to final path only if we have a valid file (avoids 0-sec or unplayable)
+            if not skip_overlay and out_path and overlay_write_path and Path(overlay_write_path).is_file():
+                size = Path(overlay_write_path).stat().st_size
+                if size > 0:
+                    try:
+                        shutil.move(overlay_write_path, out_path)
+                        _reencode_to_h264_for_ios(out_path)
+                    except (OSError, IOError) as e:
+                        logger.warning("Failed to move overlay to %s: %s", out_path, e)
+                        try:
+                            Path(overlay_write_path).unlink(missing_ok=True)
+                        except OSError:
+                            pass
+                        out_path = None
+                else:
+                    logger.warning("Overlay video was 0 bytes; not saving")
+                    try:
+                        Path(overlay_write_path).unlink(missing_ok=True)
+                    except OSError:
+                        pass
+                    out_path = None
+            elif overlay_write_path and Path(overlay_write_path).exists():
+                try:
+                    Path(overlay_write_path).unlink(missing_ok=True)
+                except OSError:
+                    pass
 
         # Final sport for report: inferred when auto, else user-selected
         final_sport = inferred_sport if (use_auto_sport and inferred_sport_conf >= 0.5) else sport
@@ -596,8 +715,8 @@ class VideoProcessor:
             "object_tracking": all_objects[:50],
             "development_plan": development_plan,
             "frame_evaluations": all_evaluations,
-            "output_video_path": out_path,
-            "output_filename": Path(out_path).name if out_path else None,
+            "output_video_path": (valid_out := _valid_output_path(out_path)),
+            "output_filename": Path(valid_out).name if valid_out else None,
             "sources": get_sources_for_sport(final_sport),
             "processing_time_sec": processing_time_sec,
         }
